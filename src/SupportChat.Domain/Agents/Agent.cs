@@ -53,6 +53,8 @@ public class Agent
 		return new Agent(id, name, seniority, AgentStatus.Active);
 	}
 
+	//Agents are on a 3 shift basis 8 hrs each.
+	//When a shift is over, the agent must finish his current chats, but will not be assigned new chats.”
 	public void StartShift()
 	{
 		if (Status != AgentStatus.Inactive)
@@ -60,6 +62,7 @@ public class Agent
 		Status = AgentStatus.Active;
 	}
 
+	//When a shift is over, the agent must finish his current chats, but will not be assigned new chats.
 	public void EndShift()
 	{
 		if (Status != AgentStatus.Active)
@@ -67,6 +70,7 @@ public class Agent
 		Status = AgentStatus.FinishingShift;
 	}
 
+	//When a shift is over, the agent must finish his current chats, but will not be assigned new chats
 	public void CompleteShift()
 	{
 		if (Status != AgentStatus.FinishingShift)
