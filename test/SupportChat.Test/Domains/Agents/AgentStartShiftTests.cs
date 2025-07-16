@@ -1,6 +1,6 @@
 ﻿using SupportChat.Domain.Agents;
 
-namespace SupportChat.Test.Domains;
+namespace SupportChat.Test.Domains.Agents;
 
 public class AgentStartShiftTests
 {
