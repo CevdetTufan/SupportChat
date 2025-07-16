@@ -1,4 +1,6 @@
-﻿namespace SupportChat.Domain.Agents;
+﻿using SupportChat.Domain.Agents.Events;
+
+namespace SupportChat.Domain.Agents;
 
 public class Agent
 {
@@ -8,9 +10,14 @@ public class Agent
 	public double Efficiency { get; private set; }
 	public AgentStatus Status { get; private set; }
 
-
+	// Active chats
 	private readonly List<Guid> _activeChatIds = new();
 	public IReadOnlyCollection<Guid> ActiveChatIds => _activeChatIds;
+
+	// Domain events
+	private readonly List<object> _domainEvents = new();
+	public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
+
 
 	private Agent(Guid id, string name, Seniority seniority, AgentStatus status)
 	{
@@ -50,7 +57,9 @@ public class Agent
 
 	public static Agent Create(Guid id, string name, Seniority seniority)
 	{
-		return new Agent(id, name, seniority, AgentStatus.Active);
+		var agent = new Agent(id, name, seniority, AgentStatus.Active);
+		agent._domainEvents.Add(new AgentShiftStartedEvent(agent.Id, DateTime.UtcNow));
+		return agent;
 	}
 
 	//Agents are on a 3 shift basis 8 hrs each.
@@ -60,6 +69,8 @@ public class Agent
 		if (Status != AgentStatus.Inactive)
 			throw new InvalidOperationException("Cannot start shift unless agent is inactive.");
 		Status = AgentStatus.Active;
+
+		_domainEvents.Add(new AgentShiftStartedEvent(Id, DateTime.UtcNow));
 	}
 
 	//When a shift is over, the agent must finish his current chats, but will not be assigned new chats.
@@ -76,6 +87,8 @@ public class Agent
 		if (Status != AgentStatus.FinishingShift)
 			throw new InvalidOperationException("Can only complete shift when finishing shift.");
 		Status = AgentStatus.Inactive;
+
+		_domainEvents.Add(new AgentShiftCompletedEvent(Id, DateTime.UtcNow));
 	}
 
 	public void AssignChat(Guid sessionId)
@@ -83,6 +96,7 @@ public class Agent
 		if (!CanAcceptChat())
 			throw new InvalidOperationException("Agent cannot accept more chats.");
 		_activeChatIds.Add(sessionId);
+		_domainEvents.Add(new ChatAssignedEvent(Id, sessionId, DateTime.UtcNow));
 	}
 
 	public void ReleaseChat(Guid sessionId)
@@ -90,5 +104,12 @@ public class Agent
 		_activeChatIds.Remove(sessionId);
 		if (Status == AgentStatus.FinishingShift && _activeChatIds.Count == 0)
 			Status = AgentStatus.Inactive;
+
+		_domainEvents.Add(new ChatAssignedEvent(Id, sessionId, DateTime.UtcNow));
+	}
+
+	public void ClearDomainEvents()
+	{
+		_domainEvents.Clear();
 	}
 }
