@@ -1,0 +1,51 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore SupportChat.sln
+
+    - name: Build solution
+      run: dotnet build SupportChat.sln --configuration Release --no-restore
+
+    - name: Debug and Run unit tests
+      # This step is modified to include debugging commands and a more verbose test run.
+      run: |
+        echo "--- Current Directory Contents (Recursive) ---"
+        ls -R
+        echo "--- Environment Variables ---"
+        env | sort
+        echo "--- Attempting to run unit tests with diagnostic verbosity ---"
+        dotnet test test/SupportChat.Test/SupportChat.Test.csproj \
+          --configuration Release \
+          --no-build \
+          --verbosity normal \
+          /p:VSTestVerbosity=detailed # This is for VSTest runner output
+          # Add this line below for even more verbose MSBuild output, but be prepared for a lot of logs.
+          # /p:MSBuildLogVerbosity=Diagnostic
+
+        echo "--- If the above failed, trying with solution file ---"
+        # Sometimes, specifying the solution file helps dotnet test correctly resolve projects.
+        # This tells dotnet test to find the test project within the context of the solution.
+        dotnet test SupportChat.sln \
+          --filter "FullyQualifiedName~SupportChat.Test" \
+          --configuration Release \
+          --no-build \
+          --verbosity normal

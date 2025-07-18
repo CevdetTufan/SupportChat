@@ -2,9 +2,13 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using SupportChat.Infrastructure.Data;
+using SupportChat.Infrastructure.Messaging;
 using SupportChat.Infrastructure.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<RabbitMqSettings>(
+	builder.Configuration.GetSection("RabbitMQ"));
 
 if (builder.Environment.IsDevelopment())
 {
@@ -32,6 +36,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 
 await app.RunAsync();

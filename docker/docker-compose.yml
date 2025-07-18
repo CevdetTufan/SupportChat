@@ -1,0 +1,32 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: supportchat-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - supportchat_net
+
+  api:
+    build:
+      context: ..
+      dockerfile: src/SupportChat.Api/Dockerfile
+    container_name: supportchat-api
+    ports:
+      - "7000:80"
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ__HOST: ${RABBITMQ_HOST}
+      RABBITMQ__USERNAME: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ__PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - supportchat_net
+
+networks:
+  supportchat_net:
+    driver: bridge
