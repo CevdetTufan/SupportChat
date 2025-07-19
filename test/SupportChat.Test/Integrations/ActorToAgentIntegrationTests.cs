@@ -264,8 +264,6 @@ internal class InMemoryAgentRepository : IAgentRepository
 
 	public void Update(Agent entity)
 	{
-		// Bellek içi referans tip olduğu için, liste zaten güncel.
-		// Gerekirse, burada ekstra mantık eklenebilir.
 	}
 
 
@@ -280,7 +278,6 @@ internal class InMemoryAgentRepository : IAgentRepository
 
 internal class IstanbulOfficeHoursProvider : IOfficeHoursProvider
 {
-	// Test senaryosu için hep true dönüyoruz:
 	public bool IsOfficeHours(DateTime _) => true;
 }
 
