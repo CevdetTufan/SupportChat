@@ -6,25 +6,13 @@ namespace SupportChat.Infrastructure.Coordination;
 
 internal class SeniorityBasedAssignment : ISessionAssignmentStrategy
 {
-	public Task<Agent?> SelectAgentAsync(ChatSession session, IReadOnlyCollection<Agent> availableAgents)
+	public Task<Agent?> SelectAgentAsync(ChatSession session, IReadOnlyCollection<Agent> pool)
 	{
-		var groups = availableAgents
-				.OrderBy(a => a.Seniority)
-				.GroupBy(a => a.Seniority);
+		var candidate = pool
+			.Where(a => a.CanAcceptChat())
+			.OrderBy(a => a.ActiveChatIds.Count)
+			.FirstOrDefault();
 
-		foreach (var bucket in groups)
-		{
-			var candidates = bucket
-				.Where(a => a.CanAcceptChat());
-
-			var pick = candidates
-				.OrderBy(a => a.ActiveChatIds.Count)
-				.FirstOrDefault();
-
-			if (pick != null)
-				return Task.FromResult<Agent?>(pick);
-		}
-
-		return Task.FromResult<Agent?>(null);
+		return Task.FromResult(candidate);
 	}
 }

@@ -13,17 +13,22 @@ internal class ChatSessionRepository : Repository<ChatSession>, IChatSessionRepo
 		_db = context;
 	}
 
-	public async Task<int> CountQueuedAsync()
+	public async Task<int> CountAllAsync(CancellationToken token = default)
 	{
-		return await _db.ChatSessions
-			   .CountAsync(s => s.AssignedAgentId == null);
+		return await _db.ChatSessions.CountAsync(token);
 	}
 
-	public async Task<ChatSession?> GetNextUnassignedAsync()
+	public async Task<int> CountQueuedAsync(CancellationToken token = default)
+	{
+		return await _db.ChatSessions
+			   .CountAsync(s => s.AssignedAgentId == null, token);
+	}
+
+	public async Task<ChatSession?> GetNextUnassignedAsync(CancellationToken token = default)
 	{
 		return await _db.ChatSessions
 			   .Where(s => s.AssignedAgentId == null)
 			   .OrderBy(s => s.CreatedAt)
-			   .FirstOrDefaultAsync();
+			   .FirstOrDefaultAsync(token);
 	}
 }

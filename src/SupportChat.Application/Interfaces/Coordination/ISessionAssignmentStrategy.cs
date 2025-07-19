@@ -7,5 +7,5 @@ public interface ISessionAssignmentStrategy
 {
 	Task<Agent?> SelectAgentAsync(
 			ChatSession session,
-			IReadOnlyCollection<Agent> availableAgents);
+			IReadOnlyCollection<Agent> pool);
 }

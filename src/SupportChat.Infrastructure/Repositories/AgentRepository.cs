@@ -26,4 +26,14 @@ internal class AgentRepository : Repository<Agent>, IAgentRepository
 			.Where(a => a.Seniority == seniority)
 			.ToListAsync();
 	}
+
+	public Task<IReadOnlyCollection<Agent>> GetNormalAgentsAsync()
+	{
+		throw new NotImplementedException();
+	}
+
+	public Task<IReadOnlyCollection<Agent>> GetOverflowAgentsAsync()
+	{
+		throw new NotImplementedException();
+	}
 }

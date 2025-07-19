@@ -5,5 +5,5 @@ namespace SupportChat.Application.Interfaces.Coordination;
 
 public interface IAgentSelector
 {
-	Task<Agent?> SelectAgentAsync(ChatSession session, int queueLength, int normalCapacity);
+	Task<Agent?> SelectAgentAsync(ChatSession session, int processedSessions, int normalCapacity);
 }

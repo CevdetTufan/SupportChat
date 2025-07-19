@@ -10,6 +10,7 @@ internal class AgentSelector : IAgentSelector
 	private readonly IAgentRepository _agentRepo;
 	private readonly ISessionAssignmentStrategy _strategy;
 	private readonly IOverflowHandler _overflow;
+
 	public AgentSelector(
 		IAgentRepository agentRepo,
 		ISessionAssignmentStrategy strategy,
@@ -19,18 +20,14 @@ internal class AgentSelector : IAgentSelector
 		_strategy = strategy;
 		_overflow = overflow;
 	}
-	public async Task<Agent?> SelectAgentAsync(ChatSession session, int queueLength, int normalCapacity)
+	public async Task<Agent?> SelectAgentAsync(ChatSession session, int processedSessions, int normalCapacity)
 	{
 		var allAgents = await _agentRepo.ListAllAsync();
+		var activeAgents = allAgents.Where(a => a.Status == AgentStatus.Active).ToList();
 
-		var activeAgents = allAgents
-			.Where(a => a.Status == AgentStatus.Active)
-			.ToList();
-
-		IReadOnlyCollection<Agent> pool = _overflow
-			.ShouldOverflow(queueLength, normalCapacity)
-				? await _overflow.GetOverflowAgentsAsync()
-				: activeAgents;
+		var pool = _overflow.ShouldOverflow(processedSessions, normalCapacity)
+			? await _overflow.GetOverflowAgentsAsync()
+			: activeAgents;
 
 		return await _strategy.SelectAgentAsync(session, pool);
 	}

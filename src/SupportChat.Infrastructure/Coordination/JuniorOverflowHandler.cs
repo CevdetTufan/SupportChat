@@ -7,10 +7,12 @@ namespace SupportChat.Infrastructure.Coordination;
 internal class JuniorOverflowHandler : IOverflowHandler
 {
 	private readonly IAgentRepository _agentRepo;
+	private readonly IOfficeHoursProvider _officeHoursProvider;
 
-	public JuniorOverflowHandler(IAgentRepository agentRepo)
+	public JuniorOverflowHandler(IAgentRepository agentRepo, IOfficeHoursProvider officeHoursProvider)
 	{
 		_agentRepo = agentRepo;
+		_officeHoursProvider = officeHoursProvider;
 	}
 
 	public async Task<IReadOnlyCollection<Agent>> GetOverflowAgentsAsync()
@@ -19,8 +21,9 @@ internal class JuniorOverflowHandler : IOverflowHandler
 		return all;
 	}
 
-	public bool ShouldOverflow(int currentQueueLength, int normalCapacity)
+	public bool ShouldOverflow(int processedSessions, int normalCapacity)
 	{
-		return currentQueueLength >= normalCapacity;
+		return processedSessions >= normalCapacity && 
+			   _officeHoursProvider.IsOfficeHours(DateTime.UtcNow);
 	}
 }
