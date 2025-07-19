@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 
 namespace SupportChat.Infrastructure.Messaging;
+
 internal class RabbitMqConsumer : IRabbitMqConsumer, IDisposable
 {
 	private readonly IChannel _channel;
