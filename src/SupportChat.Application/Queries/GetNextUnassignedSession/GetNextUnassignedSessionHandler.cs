@@ -2,7 +2,7 @@
 using SupportChat.Application.Interfaces.Repositories;
 using SupportChat.Domain.ChatSessions;
 
-namespace SupportChat.Application.Queries.ChatSessions;
+namespace SupportChat.Application.Queries.GetNextUnassignedSession;
 
 internal class GetNextUnassignedSessionHandler : IQueryHandler<GetNextUnassignedSessionQuery, ChatSession?>
 {

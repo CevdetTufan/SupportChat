@@ -2,7 +2,7 @@
 using SupportChat.Application.Interfaces.Persistence;
 using SupportChat.Application.Interfaces.Repositories;
 
-namespace SupportChat.Application.Commands.Agents;
+namespace SupportChat.Application.Commands.AssignSession;
 
 internal class AssignSessionHandler : ICommandHandler<AssignSessionCommand>
 {

@@ -1,11 +1,13 @@
 ﻿using Autofac;
-using SupportChat.Application.Commands.Agents;
-using SupportChat.Application.Commands.ChatSessions;
+using SupportChat.Application.Commands.AssignSession;
+using SupportChat.Application.Commands.CreateChatSession;
+using SupportChat.Application.Commands.EndSession;
+using SupportChat.Application.Commands.MarkSessionInactive;
+using SupportChat.Application.Commands.ProcessNextSession;
 using SupportChat.Application.Interfaces.Commands;
-using SupportChat.Application.Interfaces.Coordination;
 using SupportChat.Application.Interfaces.Queries;
-using SupportChat.Application.Queries.Agents;
-using SupportChat.Application.Queries.ChatSessions;
+using SupportChat.Application.Queries.GetActiveAgents;
+using SupportChat.Application.Queries.GetNextUnassignedSession;
 using SupportChat.Domain.Agents;
 using SupportChat.Domain.ChatSessions;
 
@@ -31,6 +33,18 @@ public class ApplicationModule : Module
 
 		builder.RegisterType<ProcessNextSessionHandler>()
 			   .As<ICommandHandler<ProcessNextSessionCommand>>()
+			   .InstancePerLifetimeScope();
+
+		builder.RegisterType<CreateChatSessionHandler>()
+			.As<ICommandHandler<CreateChatSessionCommand>>()
+			   .InstancePerLifetimeScope();
+
+		builder.RegisterType<EndSessionHandler>()
+			   .As<ICommandHandler<EndSessionCommand>>()
+			   .InstancePerLifetimeScope();
+
+		builder.RegisterType<MarkSessionInactiveHandler>()
+			.As<ICommandHandler<MarkSessionInactiveCommand>>()
 			   .InstancePerLifetimeScope();
 	}
 }
