@@ -2,7 +2,7 @@
 using SupportChat.Application.Interfaces.Repositories;
 using SupportChat.Domain.Agents;
 
-namespace SupportChat.Application.Queries.Agents;
+namespace SupportChat.Application.Queries.GetActiveAgents;
 
 internal class GetActiveAgentsHandler : IQueryHandler<GetActiveAgentsQuery, IReadOnlyCollection<Agent>>
 {

@@ -53,6 +53,14 @@ public class ChatSession
 		_domainEvents.Add(new ChatSessionTimedOutEvent(Id, DateTime.UtcNow));
 	}
 
+	public void End()
+	{
+		if (Status == ChatStatus.Inactive)
+			throw new InvalidOperationException("Session is already ended.");
+
+		Status = ChatStatus.Inactive;
+	}
+
 	public void ClearDomainEvents()
 	{
 		_domainEvents.Clear();
