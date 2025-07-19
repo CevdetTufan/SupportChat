@@ -1,10 +1,9 @@
-﻿using SupportChat.Application.Commands.Agents;
+﻿using SupportChat.Application.Commands.AssignSession;
 using SupportChat.Application.Interfaces.Commands;
 using SupportChat.Application.Interfaces.Coordination;
 using SupportChat.Application.Interfaces.Repositories;
-using SupportChat.Domain.Agents;
 
-namespace SupportChat.Application.Commands.ChatSessions;
+namespace SupportChat.Application.Commands.ProcessNextSession;
 
 public class ProcessNextSessionHandler : ICommandHandler<ProcessNextSessionCommand>
 {
