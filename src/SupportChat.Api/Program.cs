@@ -5,6 +5,7 @@ using SupportChat.Application.Modules;
 using SupportChat.Infrastructure.Data;
 using SupportChat.Infrastructure.Messaging;
 using SupportChat.Infrastructure.Modules;
+using SupportChat.Infrastructure.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -59,6 +59,10 @@ public class InfrastructureModule: Module
 			.As<IHostedService>()
 			.SingleInstance();
 
+		builder.RegisterType<PollingMonitorWorker>()
+			.As<IHostedService>()
+			.SingleInstance();
+
 		//strategy
 		builder
 			.RegisterType<SeniorityBasedAssignment>()
