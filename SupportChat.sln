@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportChat.Infrastructure"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportChat.Test", "test\SupportChat.Test\SupportChat.Test.csproj", "{7E3E4F67-125C-495A-ACB9-12C50F41E3CD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{98910389-2891-47D4-AF44-7A494DC3C502}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		docker\.env = docker\.env
 		docker\docker-compose.yml = docker\docker-compose.yml
