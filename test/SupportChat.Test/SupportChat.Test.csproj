@@ -9,13 +9,17 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.7" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Nut.Results.FluentAssertions" Version="2.1.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\SupportChat.Application\SupportChat.Application.csproj" />
     <ProjectReference Include="..\..\src\SupportChat.Domain\SupportChat.Domain.csproj" />
+    <ProjectReference Include="..\..\src\SupportChat.Infrastructure\SupportChat.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

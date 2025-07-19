@@ -1,6 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using SupportChat.Application.Modules;
 using SupportChat.Infrastructure.Data;
 using SupportChat.Infrastructure.Messaging;
 using SupportChat.Infrastructure.Modules;
@@ -20,6 +21,7 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
 			.ConfigureContainer<ContainerBuilder>(container =>
 			{
 				container.RegisterModule(new InfrastructureModule());
+				container.RegisterModule(new ApplicationModule());
 			});
 
 builder.Services.AddOpenApi();
