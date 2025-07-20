@@ -27,6 +27,11 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
 			{
 				container.RegisterModule(new InfrastructureModule());
 				container.RegisterModule(new ApplicationModule());
+			})
+			.ConfigureServices(services =>
+			{
+				services.Configure<HostOptions>(opts =>
+					opts.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
 			});
 
 builder.Services.AddOpenApi();

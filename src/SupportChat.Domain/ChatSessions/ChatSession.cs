@@ -1,4 +1,5 @@
 ﻿using SupportChat.Domain.ChatSessions.Events;
+using SupportChat.Domain.ChatSessions.Exceptions;
 
 namespace SupportChat.Domain.ChatSessions;
 
@@ -33,14 +34,14 @@ public class ChatSession
 	public void Poll()
 	{
 		if (Status == ChatStatus.Inactive)
-			throw new InvalidOperationException("Cannot poll an inactive session.");
+			throw new SessionPollCannotInactiveException("Cannot poll an inactive session.");
 		LastPolledAt = DateTime.UtcNow;
 	}
 
 	public void AssignToAgent(Guid agentId)
 	{
 		if (Status != ChatStatus.Queued)
-			throw new InvalidOperationException("Session already assigned or inactive.");
+			throw new SessionAlreadyAssignedException("Session already assigned or inactive.");
 		AssignedAgentId = agentId;
 		Status = ChatStatus.Assigned;
 	}
@@ -56,7 +57,7 @@ public class ChatSession
 	public void End()
 	{
 		if (Status == ChatStatus.Inactive)
-			throw new InvalidOperationException("Session is already ended.");
+			throw new SessionAlreadyEndedException("Session is already ended.");
 
 		Status = ChatStatus.Inactive;
 	}

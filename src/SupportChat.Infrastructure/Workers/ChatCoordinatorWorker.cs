@@ -1,8 +1,8 @@
-﻿using Autofac.Core;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SupportChat.Application.Interfaces.Coordination;
+using SupportChat.Domain.ChatSessions.Exceptions;
 
 namespace SupportChat.Infrastructure.Workers;
 
@@ -25,7 +25,30 @@ public class ChatCoordinatorWorker : BackgroundService
 
 			using var scope = _services.CreateScope();
 			var engine = scope.ServiceProvider.GetRequiredService<IChatCoordinatorEngine>();
-			await engine.ProcessNextSessionAsync();
+
+			try
+			{
+				await engine.ProcessNextSessionAsync();
+			}
+			catch (SessionAlreadyAssignedException ex)	
+			{
+				_logger.LogDebug(ex, ex.Message);
+			}
+			catch (SessionAlreadyEndedException ex)
+			{
+				_logger.LogDebug(ex, ex.Message);
+			}
+			catch (SessionPollCannotInactiveException ex)
+			{
+				_logger.LogDebug(ex, ex.Message);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "ChatCoordinatorWorker eroror: {Message}", ex.Message);
+
+				throw;
+			}
+
 			await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
 		}
 	}
