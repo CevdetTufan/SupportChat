@@ -23,6 +23,8 @@ The solution is organized into the following main layers:
 ### 1. API Layer (`SupportChat.Api`)
 - **Program.cs**: Application entry point, service and middleware configuration.
 - **Endpoints/**: HTTP endpoints for chat-related operations.
+    curl http://localhost:7000/chat/createSession \
+    request POST
 - **Middlewares/**: Global middlewares such as error handling.
 
 ### 2. Application Layer (`SupportChat.Application`)
@@ -58,9 +60,6 @@ The solution is organized into the following main layers:
 - The system uses coordination services to select an available agent based on defined strategies (e.g., seniority, availability).
 - The session is assigned, and the agent is notified.
 
-### 3. Ending a Session
-- When a chat ends, an `EndSessionCommand` is processed, updating the session status and triggering any necessary cleanup or notifications.
-
 ---
 
 ## Technologies Used
@@ -69,6 +68,7 @@ The solution is organized into the following main layers:
 - **Entity Framework Core**: ORM for data access.
 - **Docker**: Containerization for deployment and development.
 - **xUnit/NUnit**: Testing frameworks.
+- **AutoFac**: DI
 
 ---
 
@@ -132,6 +132,29 @@ SupportChat/
 
 ---
 
-## Contact & Contribution
+## Team & Shift Structure
 
-For questions or contributions, please refer to the `README.md` or open an issue in the repository. 
+SupportChat’s routing logic is built around three primary support teams plus an overflow pool. Each team works an 8-hour shift; when a shift ends, agents finish their existing chats but receive no new assignments until their next shift.
+
+| Team Name    | Shift Hours (Local Time) | Members                                | Base Efficiency Factors | Max Concurrent Chats (per agent) | Team Capacity (concurrent) |
+|--------------|--------------------------|----------------------------------------|-------------------------|----------------------------------|-----------------------------|
+| **Team A**   | 08:00 – 16:00            | 1 × Team Lead (0.5), 2 × Mid (0.6), 1 × Junior (0.4) | Lead: 0.5<br>Mid: 0.6<br>Jnr: 0.4 | 10                              | ⌊(1×10×0.5)+(2×10×0.6)+(1×10×0.4)⌋ = ⌊5+12+4⌋ = **21** |
+| **Team B**   | 08:00 – 16:00            | 1 × Senior (0.8), 1 × Mid (0.6), 2 × Junior (0.4)    | Snr: 0.8<br>Mid: 0.6<br>Jnr: 0.4 | 10                              | ⌊(1×10×0.8)+(1×10×0.6)+(2×10×0.4)⌋ = ⌊8+6+8⌋ = **22** |
+| **Team C**   | 16:00 – 00:00            | 2 × Mid (0.6)                                   | Mid: 0.6                      | 10                              | ⌊(2×10×0.6)⌋ = ⌊12⌋ = **12**     |
+| **Overflow** | Office hours only        | 6 × Junior (0.4)                                 | Jnr: 0.4                      | 10                              | ⌊(6×10×0.4)⌋ = ⌊24⌋ = **24**     |
+
+### Capacity & Queue Limits
+
+- **Per-Team Capacity**  
+  Calculated as:  capacity = ⌊∑(agents × 10 chats × efficiency)⌋
+
+- **Maximum Queue Length**  
+1.5 × team capacity (rounded down).  
+- e.g. Team A queue limit = ⌊1.5 × 21⌋ = **31**  
+- Team C queue limit = ⌊1.5 × 12⌋ = **18**  
+
+When any team’s queue reaches its limit during core office hours (08:00–00:00), the **Overflow** pool automatically “kicks in,” adding up to 24 extra concurrent chat slots at junior efficiency.
+
+---
+
+**Note:** All times use the server’s local zone (Istanbul Time, UTC+3).
