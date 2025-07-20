@@ -76,7 +76,7 @@ public class ChatSessionTests
 			.SetValue(session, startStatus);
 
 		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() => session.AssignToAgent(Guid.NewGuid()));
+		Assert.Throws<SessionAlreadyAssignedException>(() => session.AssignToAgent(Guid.NewGuid()));
 	}
 
 	[Fact]
