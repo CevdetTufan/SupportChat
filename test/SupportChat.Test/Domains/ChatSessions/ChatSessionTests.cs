@@ -1,4 +1,5 @@
 ﻿using SupportChat.Domain.ChatSessions;
+using SupportChat.Domain.ChatSessions.Exceptions;
 
 namespace SupportChat.Test.Domains.ChatSessions;
 
@@ -44,7 +45,7 @@ public class ChatSessionTests
 		session.MarkInactive();
 
 		// Act & Assert
-		Assert.Throws<InvalidOperationException>(() => session.Poll());
+		Assert.Throws<SessionPollCannotInactiveException>(() => session.Poll());
 	}
 
 	[Fact]
