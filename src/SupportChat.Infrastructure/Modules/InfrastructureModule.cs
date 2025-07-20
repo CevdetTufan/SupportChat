@@ -6,7 +6,6 @@ using SupportChat.Application.Interfaces.Persistence;
 using SupportChat.Application.Interfaces.Repositories;
 using SupportChat.Infrastructure.Coordination;
 using SupportChat.Infrastructure.Data;
-using SupportChat.Infrastructure.Messaging;
 using SupportChat.Infrastructure.Repositories;
 using SupportChat.Infrastructure.Workers;
 
@@ -45,18 +44,6 @@ public class InfrastructureModule: Module
 		builder.RegisterType<TeamRepository>()
 			   .As<ITeamRepository>()
 			   .InstancePerLifetimeScope();
-
-		// RabbitMQ publisher
-		builder
-			.RegisterType<RabbitMqPublisher>()
-			.As<IRabbitMqPublisher>()
-			.SingleInstance();
-
-		// RabbitMQ consumer
-		builder
-			.RegisterType<RabbitMqConsumer>()
-			.As<IRabbitMqConsumer>()
-			.SingleInstance();
 
 		//Background service hosted service
 		builder

@@ -6,13 +6,10 @@ using SupportChat.Api.Endpoints;
 using SupportChat.Api.Middlewares;
 using SupportChat.Application.Modules;
 using SupportChat.Infrastructure.Data;
-using SupportChat.Infrastructure.Messaging;
 using SupportChat.Infrastructure.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<RabbitMqSettings>(
-	builder.Configuration.GetSection("RabbitMQ"));
 
 if (builder.Environment.IsDevelopment())
 {

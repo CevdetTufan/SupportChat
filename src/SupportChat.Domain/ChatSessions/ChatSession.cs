@@ -1,5 +1,4 @@
-﻿using SupportChat.Domain.ChatSessions.Events;
-using SupportChat.Domain.ChatSessions.Exceptions;
+﻿using SupportChat.Domain.ChatSessions.Exceptions;
 
 namespace SupportChat.Domain.ChatSessions;
 
@@ -12,18 +11,12 @@ public class ChatSession
 	public DateTime LastPolledAt { get; private set; }
 
 
-	// Domain events
-	private readonly List<object> _domainEvents = new();
-	public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
-
-
 	private ChatSession(Guid id)
 	{
 		Id = id;
 		Status = ChatStatus.Queued;
 		CreatedAt = DateTime.UtcNow;
 		LastPolledAt = CreatedAt;
-		_domainEvents.Add(new ChatSessionCreatedEvent(id, CreatedAt));
 	}
 
 	public static ChatSession Create(Guid id)
@@ -51,7 +44,6 @@ public class ChatSession
 		if (Status == ChatStatus.Inactive)
 			return;
 		Status = ChatStatus.Inactive;
-		_domainEvents.Add(new ChatSessionTimedOutEvent(Id, DateTime.UtcNow));
 	}
 
 	public void End()
@@ -60,10 +52,5 @@ public class ChatSession
 			throw new SessionAlreadyEndedException("Session is already ended.");
 
 		Status = ChatStatus.Inactive;
-	}
-
-	public void ClearDomainEvents()
-	{
-		_domainEvents.Clear();
 	}
 }
