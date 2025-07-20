@@ -1,6 +1,4 @@
-﻿using SupportChat.Domain.Agents.Events;
-
-namespace SupportChat.Domain.Agents;
+﻿namespace SupportChat.Domain.Agents;
 
 public class Agent
 {
@@ -17,10 +15,6 @@ public class Agent
 	// Active chats
 	private readonly List<Guid> _activeChatIds = new();
 	public IReadOnlyCollection<Guid> ActiveChatIds => _activeChatIds;
-
-	// Domain events
-	private readonly List<object> _domainEvents = new();
-	public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 
 
 	private Agent(Guid id, string name, Seniority seniority, AgentStatus status, Guid teamId)
@@ -66,7 +60,6 @@ public class Agent
 	public static Agent Create(Guid id, string name, Seniority seniority, Guid teamId)
 	{
 		var agent = new Agent(id, name, seniority, AgentStatus.Active, teamId);
-		agent._domainEvents.Add(new AgentShiftStartedEvent(agent.Id, DateTime.UtcNow));
 		return agent;
 	}
 
@@ -77,8 +70,6 @@ public class Agent
 		if (Status != AgentStatus.Inactive)
 			throw new InvalidOperationException("Cannot start shift unless agent is inactive.");
 		Status = AgentStatus.Active;
-
-		_domainEvents.Add(new AgentShiftStartedEvent(Id, DateTime.UtcNow));
 	}
 
 	//When a shift is over, the agent must finish his current chats, but will not be assigned new chats.
@@ -95,8 +86,6 @@ public class Agent
 		if (Status != AgentStatus.FinishingShift)
 			throw new InvalidOperationException("Can only complete shift when finishing shift.");
 		Status = AgentStatus.Inactive;
-
-		_domainEvents.Add(new AgentShiftCompletedEvent(Id, DateTime.UtcNow));
 	}
 
 	public void AssignChat(Guid sessionId)
@@ -104,7 +93,6 @@ public class Agent
 		if (!CanAcceptChat())
 			throw new InvalidOperationException("Agent cannot accept more chats.");
 		_activeChatIds.Add(sessionId);
-		_domainEvents.Add(new ChatAssignedEvent(Id, sessionId, DateTime.UtcNow));
 	}
 
 	public void ReleaseChat(Guid sessionId)
@@ -112,12 +100,5 @@ public class Agent
 		_activeChatIds.Remove(sessionId);
 		if (Status == AgentStatus.FinishingShift && _activeChatIds.Count == 0)
 			Status = AgentStatus.Inactive;
-
-		_domainEvents.Add(new ChatAssignedEvent(Id, sessionId, DateTime.UtcNow));
-	}
-
-	public void ClearDomainEvents()
-	{
-		_domainEvents.Clear();
 	}
 }
