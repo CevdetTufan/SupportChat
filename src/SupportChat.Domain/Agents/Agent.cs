@@ -10,6 +10,10 @@ public class Agent
 	public double Efficiency { get; private set; }
 	public AgentStatus Status { get; private set; }
 
+	public Guid TeamId { get; private set; }
+	
+	public Team Team { get; private set; }
+
 	// Active chats
 	private readonly List<Guid> _activeChatIds = new();
 	public IReadOnlyCollection<Guid> ActiveChatIds => _activeChatIds;
@@ -19,7 +23,7 @@ public class Agent
 	public IReadOnlyCollection<object> DomainEvents => _domainEvents.AsReadOnly();
 
 
-	private Agent(Guid id, string name, Seniority seniority, AgentStatus status)
+	private Agent(Guid id, string name, Seniority seniority, AgentStatus status, Guid teamId)
 	{
 		if (id == Guid.Empty)
 			throw new ArgumentException("Id cannot be an empty Guid.", nameof(id));
@@ -33,11 +37,15 @@ public class Agent
 		if (!Enum.IsDefined(typeof(AgentStatus), status))
 			throw new ArgumentOutOfRangeException(nameof(status), "Invalid agent status.");
 
+		if (teamId == Guid.Empty)
+			throw new ArgumentException("TeamId cannot be an empty Guid.", nameof(teamId));
+
 		Id = id;
 		Name = name;
 		Seniority = seniority;
 		Efficiency = seniority.GetEfficiency();
 		Status = status;
+		TeamId = teamId;
 	}
 
 	//Consider the maximum concurrency (how many chats each agent can handle at the same time) is 10.
@@ -55,9 +63,9 @@ public class Agent
 		return Status == AgentStatus.Active && _activeChatIds.Count < MaxConcurrentChats;
 	}
 
-	public static Agent Create(Guid id, string name, Seniority seniority)
+	public static Agent Create(Guid id, string name, Seniority seniority, Guid teamId)
 	{
-		var agent = new Agent(id, name, seniority, AgentStatus.Active);
+		var agent = new Agent(id, name, seniority, AgentStatus.Active, teamId);
 		agent._domainEvents.Add(new AgentShiftStartedEvent(agent.Id, DateTime.UtcNow));
 		return agent;
 	}

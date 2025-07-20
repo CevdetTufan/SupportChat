@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using SupportChat.Application.Interfaces.Persistence;
 using SupportChat.Application.Interfaces.Repositories;
 
@@ -6,37 +8,46 @@ namespace SupportChat.Infrastructure.Workers;
 
 public class PollingMonitorWorker : BackgroundService
 {
-	private readonly IChatSessionRepository _sessionRepo;
-	private readonly IUnitOfWork _uow;
-
+	private readonly IServiceProvider _services;
+	private readonly ILogger<PollingMonitorWorker> _logger;
 	private readonly TimeSpan _interval = TimeSpan.FromSeconds(1);
 
-	public PollingMonitorWorker(IChatSessionRepository sessionRepo, IUnitOfWork uow)
+	public PollingMonitorWorker(IServiceProvider services, ILogger<PollingMonitorWorker> logger)
 	{
-		_sessionRepo = sessionRepo;
-		_uow = uow;
+		_services = services;
+		_logger = logger;
 	}
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
 		while (!stoppingToken.IsCancellationRequested)
 		{
-			await CheckForTimeoutsAsync(stoppingToken);
+			_logger.LogInformation("Polling Monitor Worker running at: {Time}", DateTime.Now);
+
+			using var scope = _services.CreateScope();
+			var sessionRepo = scope.ServiceProvider.GetRequiredService<IChatSessionRepository>();
+			var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+			await CheckForTimeoutsAsync(sessionRepo, uow, stoppingToken);
+
 			await Task.Delay(_interval, stoppingToken);
 		}
 	}
 
-	private async Task CheckForTimeoutsAsync(CancellationToken token)
+	private static async Task CheckForTimeoutsAsync(
+		IChatSessionRepository sessionRepo,
+		IUnitOfWork uow,
+		CancellationToken token)
 	{
-		var sessions = await _sessionRepo.ListAllAsync(token);
+		var sessions = await sessionRepo.ListAllAsync(token);
 		foreach (var session in sessions)
 		{
 			if (DateTime.UtcNow - session.LastPolledAt > TimeSpan.FromSeconds(3))
 			{
 				session.MarkInactive();
-				_sessionRepo.Update(session);
+				sessionRepo.Update(session);
 			}
 		}
-		await _uow.SaveChangesAsync();
+		await uow.SaveChangesAsync();
 	}
 }

@@ -1,11 +1,13 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using SupportChat.Api.Endpoints;
+using SupportChat.Api.Middlewares;
 using SupportChat.Application.Modules;
 using SupportChat.Infrastructure.Data;
 using SupportChat.Infrastructure.Messaging;
 using SupportChat.Infrastructure.Modules;
-using SupportChat.Infrastructure.Workers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,9 @@ builder.Services.Configure<RabbitMqSettings>(
 if (builder.Environment.IsDevelopment())
 {
 	builder.Services.AddDbContext<AppDbContext>(options =>
-		options.UseInMemoryDatabase("SupportChatDb"));
+		options.UseNpgsql(
+		builder.Configuration.GetConnectionString("DefaultConnection"),
+		npgsql => npgsql.MigrationsAssembly("SupportChat.Infrastructure")));
 }
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
@@ -23,21 +27,41 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory())
 			{
 				container.RegisterModule(new InfrastructureModule());
 				container.RegisterModule(new ApplicationModule());
+			})
+			.ConfigureServices(services =>
+			{
+				services.Configure<HostOptions>(opts =>
+					opts.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
 			});
 
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-app.Services.CreateScope().ServiceProvider
-	.GetRequiredService<AppDbContext>()
-	.Database.EnsureCreated();
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
+using (var scope = app.Services.CreateScope())
+{
+	var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	db.Database.Migrate();
+	DbInitializer.Initialize(db);
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
+app.MapScalarApiReference(options =>
+{
+	options
+		.WithTitle("Support Chat API")
+		.WithDarkMode()
+		.WithTheme(ScalarTheme.Saturn);
+});
+
 app.UseHttpsRedirection();
+
+app.MapChatEndpoints();
 
 await app.RunAsync();
