@@ -84,11 +84,5 @@ public class InfrastructureModule: Module
 			.RegisterType<ChatCoordinatorEngine>()
 			.As<IChatCoordinatorEngine>()
 			.InstancePerLifetimeScope();
-
-		// Office hours provider
-		builder
-			.RegisterType<IstanbulOfficeHoursProvider>()
-			.As<IOfficeHoursProvider>()
-			.SingleInstance();
 	}
 }
