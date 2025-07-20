@@ -4,11 +4,12 @@ namespace SupportChat.Test.Domains.Agents;
 
 public class AgentStartShiftTests
 {
+	private Guid _teamId = Guid.NewGuid();
 	[Fact]
 	public void StartShift_WhenInactive_ShouldBecomeActive()
 	{
 		// Arrange
-		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.Junior);
+		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.Junior, _teamId);
 
 		agent.EndShift();
 
@@ -29,7 +30,7 @@ public class AgentStartShiftTests
 	public void StartShift_WhenNotInactive_ShouldThrow(AgentStatus initialStatus)
 	{
 		// Arrange
-		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.MidLevel);
+		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.MidLevel, _teamId);
 
 		typeof(Agent)
 			.GetProperty("Status")
@@ -45,7 +46,7 @@ public class AgentStartShiftTests
 	public void EndShift_WhenActive_ShouldBecomeFinishingShift()
 	{
 		// Arrange
-		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.MidLevel);
+		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.MidLevel, _teamId);
 
 		Assert.Equal(AgentStatus.Active, agent.Status);
 
@@ -62,7 +63,7 @@ public class AgentStartShiftTests
 	public void EndShift_WhenNotActive_ShouldThrow(AgentStatus initialStatus)
 	{
 		// Arrange
-		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.MidLevel);
+		var agent = Agent.Create(Guid.NewGuid(), "Test Agent", Seniority.MidLevel, _teamId);
 
 		typeof(Agent)
 			.GetProperty(nameof(Agent.Status))

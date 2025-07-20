@@ -41,6 +41,11 @@ public class InfrastructureModule: Module
 			   .As<IChatSessionRepository>()
 			   .InstancePerLifetimeScope();
 
+		// Team repository
+		builder.RegisterType<TeamRepository>()
+			   .As<ITeamRepository>()
+			   .InstancePerLifetimeScope();
+
 		// RabbitMQ publisher
 		builder
 			.RegisterType<RabbitMqPublisher>()
@@ -84,11 +89,5 @@ public class InfrastructureModule: Module
 			.RegisterType<ChatCoordinatorEngine>()
 			.As<IChatCoordinatorEngine>()
 			.InstancePerLifetimeScope();
-
-		// Office hours provider
-		builder
-			.RegisterType<IstanbulOfficeHoursProvider>()
-			.As<IOfficeHoursProvider>()
-			.SingleInstance();
 	}
 }

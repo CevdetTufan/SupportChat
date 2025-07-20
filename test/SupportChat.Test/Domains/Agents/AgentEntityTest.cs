@@ -15,8 +15,9 @@ public class AgentEntityTest
 		var id = Guid.NewGuid();
 		var name = "Test Agent";
 
+		var team = new Team(Guid.NewGuid(), "Test Team", 8, 16);
 		// Act
-		var agent =  Agent.Create(id, name, seniority);
+		var agent = Agent.Create(id, name, seniority, team.Id);
 
 		// Assert
 		Assert.NotNull(agent);

@@ -15,24 +15,28 @@ public class ActorToAgentIntegrationTests
 		var agents = new List<Agent>();
 
 		// Team A: 1xTeamLead, 2xMidLevel, 1xJunior
-		agents.Add(Agent.Create(Guid.NewGuid(), "A_Lead", Seniority.TeamLead));
-		agents.Add(Agent.Create(Guid.NewGuid(), "A_Mid1", Seniority.MidLevel));
-		agents.Add(Agent.Create(Guid.NewGuid(), "A_Mid2", Seniority.MidLevel));
-		agents.Add(Agent.Create(Guid.NewGuid(), "A_Junior", Seniority.Junior));
+		var teamA = new Team(Guid.NewGuid(), "Team A",8,16);
+		agents.Add(Agent.Create(Guid.NewGuid(), "A_Lead", Seniority.TeamLead, teamA.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "A_Mid1", Seniority.MidLevel, teamA.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "A_Mid2", Seniority.MidLevel, teamA.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "A_Junior", Seniority.Junior, teamA.Id));
 
 		// Team B: 1xSenior, 1xMidLevel, 2xJunior
-		agents.Add(Agent.Create(Guid.NewGuid(), "B_Senior", Seniority.Senior));
-		agents.Add(Agent.Create(Guid.NewGuid(), "B_Mid", Seniority.MidLevel));
-		agents.Add(Agent.Create(Guid.NewGuid(), "B_Junior1", Seniority.Junior));
-		agents.Add(Agent.Create(Guid.NewGuid(), "B_Junior2", Seniority.Junior));
+		var teamB = new Team(Guid.NewGuid(), "Team B", 8, 16);
+		agents.Add(Agent.Create(Guid.NewGuid(), "B_Senior", Seniority.Senior, teamB.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "B_Mid", Seniority.MidLevel, teamB.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "B_Junior1", Seniority.Junior, teamB.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "B_Junior2", Seniority.Junior, teamB.Id));
 
 		// Team C: night shift, 2xMidLevel
-		agents.Add(Agent.Create(Guid.NewGuid(), "C_Mid1", Seniority.MidLevel));
-		agents.Add(Agent.Create(Guid.NewGuid(), "C_Mid2", Seniority.MidLevel));
+		var teamC = new Team(Guid.NewGuid(), "Team C", 16, 0);
+		agents.Add(Agent.Create(Guid.NewGuid(), "C_Mid1", Seniority.MidLevel, teamC.Id));
+		agents.Add(Agent.Create(Guid.NewGuid(), "C_Mid2", Seniority.MidLevel, teamC.Id));
 
 		// Overflow team: 6xJunior
+		var overflowTeam = new Team(Guid.NewGuid(), "Overflow Team", 8, 16);
 		for (int i = 1; i <= 6; i++)
-			agents.Add(Agent.Create(Guid.NewGuid(), $"Overflow_J{i}", Seniority.Junior));
+			agents.Add(Agent.Create(Guid.NewGuid(), $"Overflow_J{i}", Seniority.Junior, overflowTeam.Id));
 
 		return new InMemoryAgentRepository(agents);
 	}
@@ -41,17 +45,17 @@ public class ActorToAgentIntegrationTests
 	{
 		return new InMemoryChatSessionRepository();
 	}
-	
+
 	private static IUnitOfWork CreateUnitOfWork()
 	{
 		return new InMemoryUnitOfWork();
 	}
-	
+
 	private static IOverflowHandler CreateOverflow(IAgentRepository repo)
 	{
-		return new JuniorOverflowHandler(repo, new IstanbulOfficeHoursProvider());
+		return new JuniorOverflowHandler(repo);
 	}
-	
+
 	private static ISessionAssignmentStrategy CreateStrategy()
 	{
 		return new SeniorityBasedAssignment();
@@ -276,9 +280,5 @@ internal class InMemoryAgentRepository : IAgentRepository
 			_agents.Where(a => a.Name.StartsWith("Overflow")).ToList());
 }
 
-internal class IstanbulOfficeHoursProvider : IOfficeHoursProvider
-{
-	public bool IsOfficeHours(DateTime _) => true;
-}
 
 #endregion

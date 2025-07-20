@@ -1,4 +1,17 @@
 services:
+  supportchat-postgres:
+    image: postgres:15
+    container_name: supportchat-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "15438:5432"
+    volumes:
+      - supportchat_pgdata:/var/lib/postgresql/data
+    networks:
+      - supportchat_net
   rabbitmq:
     image: rabbitmq:3-management
     container_name: supportchat-rabbitmq
@@ -17,15 +30,26 @@ services:
       dockerfile: src/SupportChat.Api/Dockerfile
     container_name: supportchat-api
     ports:
-      - "7000:80"
+      - "7000:7000"
     depends_on:
       - rabbitmq
+      - supportchat-postgres
     environment:
       RABBITMQ__HOST: ${RABBITMQ_HOST}
       RABBITMQ__USERNAME: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ__PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+    
+      ConnectionStrings__DefaultConnection: >
+        Host=supportchat-postgres;
+        Port=5432;
+        Database=${POSTGRES_DB};
+        Username=${POSTGRES_USER};
+        Password=${POSTGRES_PASSWORD}
     networks:
       - supportchat_net
+
+volumes:
+  supportchat_pgdata:
 
 networks:
   supportchat_net:
