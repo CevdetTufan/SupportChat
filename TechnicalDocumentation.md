@@ -134,7 +134,8 @@ SupportChat/
 
 ## Team & Shift Structure
 
-SupportChat’s routing logic is built around three primary support teams plus an overflow pool. Each team works an 8-hour shift; when a shift ends, agents finish their existing chats but receive no new assignments until their next shift.
+**Team & Shift Structure,** reflecting that the Overflow pool only operates during the 08:00–
+16:00 day shift (night coverage is handled exclusively by Team C):
 
 | Team Name    | Shift Hours (Local Time) | Members                                | Base Efficiency Factors | Max Concurrent Chats (per agent) | Team Capacity (concurrent) |
 |--------------|--------------------------|----------------------------------------|-------------------------|----------------------------------|-----------------------------|
@@ -153,7 +154,8 @@ SupportChat’s routing logic is built around three primary support teams plus a
 - e.g. Team A queue limit = ⌊1.5 × 21⌋ = **31**  
 - Team C queue limit = ⌊1.5 × 12⌋ = **18**  
 
-When any team’s queue reaches its limit during core office hours (08:00–00:00), the **Overflow** pool automatically “kicks in,” adding up to 24 extra concurrent chat slots at junior efficiency.
+Overflow only activates when Team A or Team B reaches its queue limit between 08:00–16:00.
+Outside of those hours (16:00–08:00), Team C covers the night shift without Overflow.
 
 ---
 
