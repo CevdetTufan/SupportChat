@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using SupportChat.Application.Commands.AssignSession;
 using SupportChat.Application.Commands.CreateChatSession;
-using SupportChat.Application.Commands.EndSession;
 using SupportChat.Application.Commands.MarkSessionInactive;
 using SupportChat.Application.Commands.ProcessNextSession;
 using SupportChat.Application.Interfaces.Commands;
@@ -37,10 +36,6 @@ public class ApplicationModule : Module
 
 		builder.RegisterType<CreateChatSessionHandler>()
 			.As<ICommandHandler<CreateChatSessionCommand>>()
-			   .InstancePerLifetimeScope();
-
-		builder.RegisterType<EndSessionHandler>()
-			   .As<ICommandHandler<EndSessionCommand>>()
 			   .InstancePerLifetimeScope();
 
 		builder.RegisterType<MarkSessionInactiveHandler>()
