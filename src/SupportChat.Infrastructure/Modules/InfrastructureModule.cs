@@ -41,6 +41,11 @@ public class InfrastructureModule: Module
 			   .As<IChatSessionRepository>()
 			   .InstancePerLifetimeScope();
 
+		// Team repository
+		builder.RegisterType<TeamRepository>()
+			   .As<ITeamRepository>()
+			   .InstancePerLifetimeScope();
+
 		// RabbitMQ publisher
 		builder
 			.RegisterType<RabbitMqPublisher>()
